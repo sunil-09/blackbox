@@ -30,4 +30,30 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
-  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/subnets: subnet-0ec79949569868ce4,subnet-07162865076575b84
+    alb.ingress.kubernetes.io/target-type: ip
+  finalizers:
+  - ingress.k8s.aws/resources
+  labels:
+    app.kubernetes.io/name: load-balancer-example
+  name: external-ip
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: example-service
+            port:
+              number: 80
+        path: /*
+        pathType: ImplementationSpecific
